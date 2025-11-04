@@ -27,3 +27,8 @@ TEST_DIR=
 # YOLO 모델 학습 결과 저장 폴더 경로
 RUN_DIR=
 ```
+
+최종 발표 자료(보고서)
+
+개인 협업 일지
+이승철 - https://www.notion.so/2a0eaebccce6811db1d3de8954470add?source=copy_link
