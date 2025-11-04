@@ -32,3 +32,4 @@ RUN_DIR=
 
 개인 협업 일지
 이승철 - https://www.notion.so/2a0eaebccce6811db1d3de8954470add?source=copy_link
+손성경 - https://www.notion.so/29c2574f495880c7b0cad9551567753d?source=copy_link
