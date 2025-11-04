@@ -29,11 +29,13 @@ RUN_DIR=
 ```
 
 최종 발표 자료(보고서)  
-[📄 프로젝트 보고서 (PDF)](4팀 최종발표.pdf)
+[📄 프로젝트 보고서 (PDF)](report.pdf)
 
 개인 협업 일지
 
 이승철 - https://www.notion.so/2a0eaebccce6811db1d3de8954470add?source=copy_link
+
+정예진 - https://www.notion.so/2a0fce412ebd8001be51dfdefe7fce90?v=2a0fce412ebd80ad9c11000cf704c795&source=copy_link
 
 손성경 - https://www.notion.so/29c2574f495880c7b0cad9551567753d?source=copy_link
 
