@@ -10,28 +10,32 @@ from PIL import Image
 from torchvision import transforms as T
 from torchvision.transforms import functional as TF
 
+# xywh -> xyxy 변환 함수
 def xywh_to_xyxy(box: List[float]) -> List[float]:
     x, y, w, h = box
     return [x, y, x + w, y + h]
 
+# 타겟의 바운딩 박스, area를 원본크기에서 리사이즈 크기로 스케일링
 def resize_target(target: Dict ,original_size, new_size):
     ow, oh = original_size
     nw, nh = new_size
-    scale_w, scale_h = nw / ow, nh / oh
+    scale_x, scale_y = nw / ow, nh / oh
 
-    scaled_x1, scaled_y1, scaled_x2, scaled_y2 = 0, 0, 0, 0
-    scaled_boxes = []
-    for k, v in target.items():
-        if k == 'boxes':
-            for box in v:
-                x1, y1, x2, y2 = box
-                scaled_x1, scaled_y1, scaled_x2, scaled_y2 = x1 * scale_w, y1 * scale_h, x2 * scale_w, y2 * scale_h
-                scaled_boxes.append([scaled_x1, scaled_y1, scaled_x2, scaled_y2])
+    if "boxes" in target and target["boxes"].numel() > 0:
+        boxes = target["boxes"].clone().float()
+        # x는 sx, y는 sy로 각각 스케일
+        boxes[:, [0,2]] *= scale_x
+        boxes[:, [1,3]] *= scale_y
+        target["boxes"] = boxes
 
-            target[k] = torch.tensor(scaled_boxes)
-        if k == 'area':
-            scaled_a = (scaled_x2 - scaled_x1) * (scaled_y2 - scaled_y1)
-            target[k] = scaled_a
+        # 리사이즈된 박스 좌표 맞춰 면적 다시 계산
+        w = (boxes[:, 2] - boxes[:, 0]).clamp(min=0)
+        h = (boxes[:, 3] - boxes[:,1]).clamp(min=0)
+        target["area"] = (w * h).to(torch.float32)
+    else:
+        target["boxes"] = torch.zeros((0, 4), dtype=torch.float32)
+        target["area"] = torch.zeros((0,), dtype=torch.float32)
+
     return target
 
 class CocoDetWrapped(CocoDetection):
@@ -40,8 +44,11 @@ class CocoDetWrapped(CocoDetection):
         self._transforms = transforms
 
 
-    def __getitem__(self, idx: int) -> Tuple[torch.Tensor, Dict[str, Any]]:
+    def __getitem__(self, idx: int):
         img, anno = super().__getitem__(idx)
+
+        orig_w, orig_h = img.size
+
         # bbox 없거나 crowd인 항목 제거
         anno = [o for o in anno if ('bbox' in o) and (o.get('iscrowd', 0) == 0)]
 
@@ -70,8 +77,10 @@ class CocoDetWrapped(CocoDetection):
         }
         if self._transforms is not None:
             img = self._transforms(img)
-            _, orig_h, orig_w = img.shape
-            target = resize_target(target, (orig_h, orig_w), (640, 640))
+            # 모델 입력으로 들어가는 이미지 크기 기록
+            _, nh, nw = img.shape
+            target["img_size"] = (nw, nh)
+            target = resize_target(target, (orig_w, orig_h), (nw, nh))
         return img, target
 
 
@@ -98,7 +107,7 @@ class TestDataset(Dataset):
     def __init__(self, img_dir="./test"):
         self.img_dir = Path(img_dir)
         self.images = sorted(list(self.img_dir.glob("*.png")))
-        self.transform = T.ToTensor()
+        self.transform = T.Compose([T.Resize((640,640)), T.ToTensor()])
 
     def __len__(self):
         return len(self.images)
@@ -106,8 +115,15 @@ class TestDataset(Dataset):
     def __getitem__(self,idx):
         img_path = self.images[idx]
         img = Image.open(img_path).convert("RGB")
-        img_tensor = TF.to_tensor(img)
-        target = {"image_id": idx, "file_name": os.path.basename(img_path)}
+
+        orig_w, orig_h = img.size
+
+        img_tensor = self.transform(img)
+        _, nh, nw = img_tensor.shape
+
+
+        target = {"image_id": idx, "file_name": os.path.basename(img_path),
+                  "orig_size": (orig_w, orig_h), "img_size": (nw, nh)}
         return img_tensor, target
 
 
