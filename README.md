@@ -31,6 +31,9 @@ RUN_DIR=
 최종 발표 자료(보고서)
 
 개인 협업 일지
+
 이승철 - https://www.notion.so/2a0eaebccce6811db1d3de8954470add?source=copy_link
+
 손성경 - https://www.notion.so/29c2574f495880c7b0cad9551567753d?source=copy_link
+
 최지혁 - https://www.notion.so/29cb65ba18c68112913ef4fe0240d762?source=copy_link
