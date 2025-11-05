@@ -11,10 +11,10 @@ from pathlib import Path
 import argparse
 import torch
 import random
-from data_load import data_paths
-from datasets import build_datasets_from_paths
-from model import build_model
-from engine import (
+from .data_load import data_paths
+from .datasets import build_datasets_from_paths
+from. model import build_model
+from .engine import (
     collate_fn, train_one_epoch, validate_loss,
     evaluate_coco_map, save_checkpoint
 )

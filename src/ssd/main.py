@@ -6,9 +6,9 @@ from torchvision.models.detection.ssd import SSDClassificationHead
 from pathlib import Path
 import os
 
-from train_and_eval import train_each_epoch, evaluate
-from dataloader import get_trainloader
-from submit import test_csv
+from .train_and_eval import train_each_epoch, evaluate
+from .dataloader import get_trainloader
+from .submit import test_csv
 
 
 def main(DATA_DIR, device, num_epochs=10, size=300):

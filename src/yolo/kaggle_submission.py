@@ -73,14 +73,14 @@ def yolo_make_submission(
             cls = boxes.cls[i]
             conf = boxes.conf[i]
             xywh = boxes.xywh[i]
-            x, y, ww, hh = xywh[0], xywh[1], xywh[2], xywh[3]
+            center_x, center_y, ww, hh = xywh[0], xywh[1], xywh[2], xywh[3]
             # 경계 보정
-            x = max(0.0, x); y = max(0.0, y)
+            x = max(0.0, center_x - ww/2); y = max(0.0, center_y - hh/2)
             ww = max(0.0, min(ww, W - x))
             hh = max(0.0, min(hh, H - y))
 
             category_id = class_map.get(cls, cls) if class_map else cls
-            rows.append([ann_id, img_id, category_id,
+            rows.append([ann_id, img_id, int(category_id),
                             int(x), int(y), int(ww), int(hh),
                             round(float(conf), 2)])
             ann_id += 1

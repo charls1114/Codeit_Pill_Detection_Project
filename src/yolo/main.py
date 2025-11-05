@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
-from train_yolo import yolo_train, yolo_test_data_prediction
-from kaggle_submission import make_class_map, yolo_make_submission
+from .train_yolo import yolo_train, yolo_test_data_prediction
+from .kaggle_submission import make_class_map, yolo_make_submission
 
 def start_yolo(model:str, yolo_config_file_name:str):
     yolo_data_dir = os.getenv("YOLO_DATA_DIR")
